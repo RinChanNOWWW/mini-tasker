@@ -9,7 +9,7 @@ import (
 var (
 	// ErrAddDupNameTask informs their is already a task in the
 	// scheduler with the same name.
-	ErrAddDupNameTask = errors.New("Duplicated Task Name")
+	ErrAddDupNameTask = errors.New("duplicated task name")
 )
 
 // scheduler is the struct that holds all tasks
@@ -53,13 +53,15 @@ func (s *scheduler) Start() {
 
 // loop is the method for task to run periodically
 func (s *scheduler) loop(ctx context.Context, task Task) {
+	ticker := time.NewTicker(task.Interval())
 	for {
 		select {
 		case <-ctx.Done():
+			ticker.Stop()
 			return
-		default:
-			time.Sleep(task.Interval())
+		case <-ticker.C:
 			task.DoTask()
+
 		}
 	}
 }
